@@ -21,14 +21,17 @@ public class InfinityAction implements Action<Execution> {
         poll()
             .result(r -> {
                 Throwable error = r.getThrowable();
-                LOG.error("Unexpected error", error);
+                if( error == null) {
+                    Execution.fork().start(this);
+                } else {
+                    LOG.error("Unexpected error", error);
+                }
             });
     }
 
     private Promise<Void> poll() {
         return getFoo()
-            .flatMap(this::useFoo)
-            .flatMap(v -> this.poll());
+            .flatMap(this::useFoo);
     }
 
     private Promise<Foo> getFoo() {
